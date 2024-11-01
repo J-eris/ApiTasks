@@ -13,6 +13,13 @@ class AttachmentController extends Controller
     public function index():JsonResponse
     {
         $attachments = Attachment::with('auction')->paginate(10);
+
+        if ($attachments->isEmpty()) {
+            return response()->json([
+                'message' => 'No attachments found',
+            ], 404);
+        }
+
         return response()->json([
             'message' => 'Attachments retrieved successfully',
             'attachments' => $attachments

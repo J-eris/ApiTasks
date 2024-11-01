@@ -20,7 +20,7 @@ class CreateUsersTable extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('phone')->nullable();
             $table->string('password');
-            $table->enum('role', ['admin', 'developer', 'freelance', 'client'])->default('client');
+            // $table->enum('role', ['admin', 'developer', 'freelance', 'client'])->default('client');
             $table->decimal('balance', 8, 2)->nullable();
             $table->string('address')->nullable();
             $table->string('birthday')->nullable();

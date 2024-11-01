@@ -35,7 +35,7 @@ class AuctionRequest extends FormRequest
         ];
 
         if ($this->isMethod('post')) {
-            $rules['description'] = 'required|string';
+            // $rules['description'] = 'required|string';
             $rules['min_price'] = 'required|numeric';
             $rules['max_price'] = 'required|numeric';
             $rules['reference_price'] = 'required|numeric';

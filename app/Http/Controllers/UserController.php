@@ -25,12 +25,18 @@ class UserController extends Controller
 
     public function store(UserRequest $request)
     {
-        $this->authorize('create', User::class);
-
         $validatedData = $request->validated();
         $validatedData['password'] = Hash::make($validatedData['password']);
 
         $user = User::create($validatedData);
+
+        if ($request->has('roles')) {
+            $user->assignRole($request->roles);
+        }
+
+        if ($request->has('permissions')) {
+            $user->givePermissionTo($request->permissions);
+        }
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -64,6 +70,14 @@ class UserController extends Controller
         if ($user) {
             $validatedData = $request->validated();
             $user->update($validatedData);
+
+            if ($request->has('roles')) {
+                $user->syncRoles($request->roles);
+            }
+
+            if ($request->has('permissions')) {
+                $user->syncPermissions($request->permissions);
+            }
 
             return response()->json([
                 'message' => 'User updated successfully',
@@ -102,6 +116,18 @@ class UserController extends Controller
             return response()->json(['message' => 'User deleted'], 200);
         } else {
             return response()->json(['message' => 'User not found'], 404);
+        }
+    }
+
+    // Verificar si un usuario tiene un rol específico
+    public function checkRole(Request $request)
+    {
+        $user = User::user();
+
+        if ($user->hasRole($request->role)) {
+            return response()->json(['message' => 'The user has the role'], 200);
+        } else {
+            return response()->json(['message' => 'The user does not have the role'], 404);
         }
     }
 }
