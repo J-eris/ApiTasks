@@ -42,7 +42,7 @@ class UserRequest extends FormRequest
 
             case 'PUT':
             case 'PATCH':
-                $userId = $this->route('id');
+                $userId = $this->route('user');
                 $rules = [
                     'name' => 'sometimes|required|string|max:255',
                     'email' => 'sometimes|required|string|email|max:255|unique:users,email,' . $userId,
