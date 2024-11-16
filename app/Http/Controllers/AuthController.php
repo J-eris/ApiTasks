@@ -7,13 +7,15 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
     public function register(RegisterRequest $request)
     {
         try {
-            $validatedData = $request->validated();;
+            $validatedData = $request->validated();
 
             $user = User::create([
                 'name' => $validatedData['name'],
@@ -22,8 +24,20 @@ class AuthController extends Controller
                 'phone' => $validatedData['phone'] ?? null,
                 'address' => $validatedData['address'] ?? null,
                 'birthday' => $validatedData['birthday'] ?? null,
-                'role' => $validatedData['role'] ?? 'client',
+                'account_status' => 'inactive',
+                // 'verification_token' => Str::random(60),
             ]);
+
+            // Send roles client to user
+            if ($request->has('roles')) {
+                $user->assignRole($request->roles);
+            }
+
+            if ($request->has('permissions')) {
+                $user->givePermissionTo($request->permissions);
+            }
+
+            // Mail::to($user->email)->send(new \App\Mail\VerifyEmail($user));
 
             return response()->json([
                 'status' => 'success',
@@ -38,6 +52,20 @@ class AuthController extends Controller
             ], 500);
         }
     }
+
+    // public function verifyEmail($token)
+    // {
+    //     $user = User::where('verification_token', $token)->firstOrFail();
+
+    //     $user->verification_token = null;
+    //     $user->account_status = 'active';
+    //     $user->save();
+
+    //     return response()->json([
+    //         'status' => 'true',
+    //         'message' => 'Email verified successfully!',
+    //     ], 200);
+    // }
 
     public function login(Request $request)
     {

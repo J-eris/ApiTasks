@@ -30,7 +30,7 @@ class RegisterRequest extends FormRequest
             'phone' => 'sometimes|string|max:20',
             'address' => 'sometimes|string|max:255',
             'birthday' => 'sometimes|date',
-            'role' => 'sometimes|in:admin,developer,freelance,client',
+            // 'role' => 'sometimes|in:admin,developer,freelance,client',
         ];
     }
 }

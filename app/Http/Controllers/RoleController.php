@@ -22,6 +22,15 @@ class RoleController extends Controller
         ], 200);
     }
 
+    public function permissions()
+    {
+        $permissions = Permission::all();
+        return response()->json([
+            'message' => 'Permissions retrieved successfully',
+            'permissions' => $permissions
+        ], 200);
+    }
+
     public function store(Request $request)
     {
         $validatedData = $request->validate([
