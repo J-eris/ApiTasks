@@ -6,11 +6,12 @@ use App\Http\Requests\AttachmentRequest;
 use App\Models\Attachment;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class AttachmentController extends Controller
 {
 
-    public function index():JsonResponse
+    public function index(): JsonResponse
     {
         $attachments = Attachment::with('auction')->paginate(10);
 
@@ -26,18 +27,42 @@ class AttachmentController extends Controller
         ], 200);
     }
 
-    public function store(AttachmentRequest $request)
+    public function store(Request $request)
     {
+        // Validar la solicitud
+        $request->validate([
+            'auction_id' => 'required|exists:auctions,id',
+            'file' => 'required_if:file_type,image,video|file|mimes:jpg,jpeg,png,gif,mp4,avi,webm|max:20480', // 20MB
+            'file_type' => 'required|in:image,video,link',
+            'file_path' => 'required_if:file_type,link|url|nullable',
+        ]);
+
         try {
-            $attachment = Attachment::create($request->all());
+            if ($request->file_type !== 'link') {
+                if ($request->hasFile('file')) {
+                    $file = $request->file('file');
+                    $path = $file->store('attachments', 'public');
+                    $filePath = Storage::url($path);
+                } else {
+                    return response()->json(['error' => 'Archivo inválido'], 400);
+                }
+            } else {
+                $filePath = $request->input('file_path');
+            }
+
+            $attachment = Attachment::create([
+                'file_type' => $request->file_type,
+                'file_path' => $filePath,
+                'auction_id' => $request->auction_id,
+            ]);
 
             return response()->json([
-                'message' => 'Attachment created successfully',
+                'message' => 'Adjunto creado exitosamente',
                 'attachment' => $attachment,
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Failed to create attachment',
+                'message' => 'Error al crear el adjunto',
                 'error' => $e->getMessage(),
             ], 400);
         }
