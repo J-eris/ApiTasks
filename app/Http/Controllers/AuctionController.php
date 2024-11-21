@@ -11,7 +11,7 @@ class AuctionController extends Controller
 
     public function index()
     {
-        $auctions = Auction::with('category', 'user')->paginate(10);
+        $auctions = Auction::with('category', 'user', 'attachments')->paginate(10);
         return response()->json([
             'message' => 'Auctions retrieved successfully',
             'auctions' => $auctions
@@ -21,7 +21,7 @@ class AuctionController extends Controller
     public function store(AuctionRequest $request)
     {
         try {
-            
+
             $auction = Auction::create($request->all());
 
             return response()->json([
@@ -56,7 +56,7 @@ class AuctionController extends Controller
     {
         $auction = Auction::find($id);
 
-        if ($auction) {            
+        if ($auction) {
             $auction->update($request->all());
 
             return response()->json([

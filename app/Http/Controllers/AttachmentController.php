@@ -32,13 +32,13 @@ class AttachmentController extends Controller
         // Validar la solicitud
         $request->validate([
             'auction_id' => 'required|exists:auctions,id',
-            'file' => 'required_if:file_type,image,video|file|mimes:jpg,jpeg,png,gif,mp4,avi,webm|max:20480', // 20MB
+            'file' => 'required_if:file_type,image|file|mimes:jpg,jpeg,png,gif|max:20480', // 20MB
             'file_type' => 'required|in:image,video,link',
             'file_path' => 'required_if:file_type,link|url|nullable',
         ]);
 
         try {
-            if ($request->file_type !== 'link') {
+            if ($request->file_type === 'image') {
                 if ($request->hasFile('file')) {
                     $file = $request->file('file');
                     $path = $file->store('attachments', 'public');
