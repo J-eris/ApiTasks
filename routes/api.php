@@ -20,6 +20,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanc
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
+    Route::get('user/{id}', [UserController::class, 'show']);
     Route::post('/change-password', [AuthController::class, 'changePassword']);
 
     Route::middleware(['role:admin'])->group(function () {

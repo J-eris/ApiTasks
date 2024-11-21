@@ -11,7 +11,7 @@ class AuctionController extends Controller
 
     public function index()
     {
-        $auctions = Auction::with('category', 'user', 'attachments')->paginate(10);
+        $auctions = Auction::with('category', 'user', 'attachments', 'bids')->paginate(10);
         return response()->json([
             'message' => 'Auctions retrieved successfully',
             'auctions' => $auctions
