@@ -23,6 +23,9 @@ class CreateAuctionsTable extends Migration
             $table->decimal('max_price', 10, 2);
             $table->decimal('reference_price', 10, 2);
             $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
+            $table->enum('status', ['available', 'closed', 'cancelled'])->default('available');
+            $table->timestamp('expiration_date')->nullable();
+            $table->decimal('final_price', 10, 2)->nullable();
             $table->timestamps();
         });
     }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\AuctionRequest;
 use App\Models\Auction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AuctionController extends Controller
 {
@@ -84,6 +85,27 @@ class AuctionController extends Controller
             return response()->json([
                 'message' => 'Auction not found',
             ], 404);
+        }
+    }
+
+    public function checkAuctionStatus()
+    {
+        $auctions = Auction::where('status', 'available')
+            ->where(function ($query) {
+                $query->where('expiration_date', '<=', now())
+                    ->orWhereHas('bids', function ($query) {
+                        $query->where('bid_price', '>=', DB::raw('auctions.final_price'));
+                    });
+            })
+            ->get();
+
+        foreach ($auctions as $auction) {
+            if ($auction->expiration_date && $auction->expiration_date <= now()) {
+                $auction->status = 'closed';
+            } elseif ($auction->bids()->where('bid_price', '>=', $auction->final_price)->exists()) {
+                $auction->status = 'closed';
+            }
+            $auction->save();
         }
     }
 }

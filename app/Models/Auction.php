@@ -18,6 +18,9 @@ class Auction extends Model
         'reference_price',
         'category_id',
         'created_by',
+        'status',
+        'expiration_date',
+        'final_price',
     ];
 
     public function category()

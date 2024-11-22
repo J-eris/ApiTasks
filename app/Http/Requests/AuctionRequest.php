@@ -32,6 +32,9 @@ class AuctionRequest extends FormRequest
             'reference_price' => 'nullable|numeric',
             'description' => 'nullable|string',
             'created_by' => 'nullable|exists:users,id',
+            'status' => 'nullable|in:available,closed,cancelled',
+            'expiration_date' => 'nullable|date',
+            'final_price' => 'nullable|numeric',
         ];
 
         if ($this->isMethod('post')) {
@@ -50,6 +53,9 @@ class AuctionRequest extends FormRequest
                 'reference_price' => 'sometimes|nullable|numeric',
                 'description' => 'sometimes|nullable|string',
                 'created_by' => 'sometimes|nullable|exists:users,id',
+                'status' => 'sometimes|nullable|in:available,closed,cancelled',
+                'expiration_date' => 'sometimes|nullable|date',
+                'final_price' => 'sometimes|nullable|numeric',
             ];
         }
 
