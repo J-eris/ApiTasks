@@ -19,7 +19,7 @@ class Notification extends Model
     public function users()
     {
         return $this->belongsToMany(User::class, 'notification_user')
-            ->withPivot('is_read')
+            ->withPivot('id', 'is_read')
             ->withTimestamps();
     }
 }

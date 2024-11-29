@@ -23,11 +23,20 @@ class NotificationUserRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            //
+        $rules = [
             'notification_id' => 'required|exists:notifications,id',
             'user_id' => 'required|exists:users,id',
             'is_read' => 'required|boolean',
         ];
+
+        if ($this->isMethod('put') || $this->isMethod('patch')) {
+            $rules = [
+                'notification_id' => 'sometimes|exists:notifications,id',
+                'user_id' => 'sometimes|exists:users,id',
+                'is_read' => 'sometimes|boolean',
+            ];
+        }
+
+        return $rules;
     }
 }
