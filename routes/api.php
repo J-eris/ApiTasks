@@ -8,6 +8,7 @@ use App\Http\Controllers\CategoryController;
 // use App\Http\Controllers\Controller;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\NotificationUserController;
 use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TicketController;
@@ -42,4 +43,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('messages', MessageController::class);
     Route::apiResource('tickets', TicketController::class);
     Route::apiResource('payment-methods', PaymentMethodController::class);
+    Route::apiResource('notification_user', NotificationUserController::class);
+    Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
 });

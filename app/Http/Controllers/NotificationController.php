@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\NotificationRequest;
 use App\Models\Notification;
+use App\Models\NotificationUser;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class NotificationController extends Controller
 {
@@ -15,7 +17,7 @@ class NotificationController extends Controller
      */
     public function index()
     {
-        $notifications = Notification::with('user')->paginate(10);
+        $notifications = Notification::with('users')->paginate(10);
         return response()->json([
             'message' => 'Notifications retrieved successfully',
             'notifications' => $notifications
@@ -65,7 +67,7 @@ class NotificationController extends Controller
      */
     public function show($id)
     {
-        $notification = Notification::with('user')->find($id);
+        $notification = Notification::with('users')->find($id);
 
         if ($notification) {
             return response()->json([
@@ -136,5 +138,16 @@ class NotificationController extends Controller
                 'message' => 'Notification not found',
             ], 404);
         }
+    }
+
+    public function markAsRead($id)
+    {
+        $notificationUser = NotificationUser::where('notification_id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+        $notificationUser->is_read = true;
+        $notificationUser->save();
+
+        return response()->json(['message' => 'Notification marked as read']);
     }
 }

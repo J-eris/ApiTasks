@@ -24,7 +24,7 @@ class NotificationRequest extends FormRequest
     public function rules()
     {
         $rules = [
-            'user_id' => 'required|exists:users,id',
+            'user_id' => 'exists:users,id',
             'type' => 'required|in:email,push',
             'message' => 'required|string',
             'is_read' => 'boolean',
