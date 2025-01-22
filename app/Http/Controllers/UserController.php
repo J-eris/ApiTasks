@@ -23,6 +23,15 @@ class UserController extends Controller
         ], 200);
     }
 
+    public function usersList()
+    {
+        $users = User::with('roles')->get();
+        return response()->json([
+            'message' => 'Users retrieved successfully',
+            'users' => $users
+        ], 200);
+    }
+
     public function store(UserRequest $request)
     {
         $validatedData = $request->validated();

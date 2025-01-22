@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
+use Google_Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -134,5 +135,73 @@ class AuthController extends Controller
         $user->save();
 
         return response()->json(['message' => 'Password changed successfully'], 200);
+    }
+
+    public function checkGoogleUser(Request $request)
+    {
+        $token = $request->input('token');
+
+        $client = new Google_Client(['client_id' => env('GOOGLE_CLIENT_ID')]);
+        $payload = $client->verifyIdToken($token);
+
+        if ($payload) {
+            $email = $payload['email'];
+            $name = $payload['name'];
+
+            $user = User::with('roles')->where('email', $email)->first();
+
+            if ($user) {
+                return response()->json([
+                    'exists' => true,
+                    'user' => $user
+                ]);
+            } else {
+                return response()->json([
+                    'exists' => false,
+                    'email' => $email,
+                    'name' => $name
+                ]);
+            }
+        } else {
+            return response()->json(['error' => 'Token inválido'], 400);
+        }
+    }
+
+    public function loginWithGoogle(Request $request)
+    {
+        $token = $request->input('token');
+        $roles = $request->input('roles');
+
+        $client = new Google_Client(['client_id' => env('GOOGLE_CLIENT_ID')]);
+        $payload = $client->verifyIdToken($token);
+
+        if ($payload) {
+            $email = $payload['email'];
+            $name = $payload['name'];
+
+            $user = User::where('email', $email)->first();
+
+            if (!$user) {
+                $password = uniqid();
+                $user = User::create([
+                    'name' => $name,
+                    'email' => $email,
+                    'password' => Hash::make($password),
+                    'account_status' => 'active',
+                    // 'avatar' => $avatar,
+                ]);
+                $user->assignRole($roles ?? 'client');
+            }
+
+            Auth::login($user);
+
+            return response()->json([
+                'status' => 'true',
+                'user' => $user,
+                'token' => $user->createToken('auth_token')->plainTextToken,
+            ]);
+        } else {
+            return response()->json(['error' => 'Error al autenticar con Google'], 400);
+        }
     }
 }
